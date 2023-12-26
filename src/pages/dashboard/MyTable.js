@@ -56,7 +56,17 @@ export default function CustomersDemo() {
 
   const exportCSV = () => {
     if (dt.current) {
-      dt.current.exportCSV();
+      const selectedData = selectedCustomers.map((selectedCustomer) => {
+        // Find the selected customer in the filtered data
+        return filteredCustomers.find(
+          (customer) => customer.id === selectedCustomer.id
+        );
+      });
+
+      // Remove any undefined/null values from the array
+      const cleanedSelectedData = selectedData.filter(Boolean);
+
+      dt.current.exportCSV({ selectionOnly: true, data: cleanedSelectedData });
     } else {
       toast.current.show({
         severity: "warn",
