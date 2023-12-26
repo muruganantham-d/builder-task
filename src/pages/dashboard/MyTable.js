@@ -13,7 +13,8 @@ import { Divider } from "primereact/divider";
 import "primeicons/primeicons.css";
 
 export default function CustomersDemo() {
-  const [customers, setCustomers] = useState([]);
+  const [originalCustomers, setOriginalCustomers] = useState([]);
+  const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [selectedCustomers, setSelectedCustomers] = useState([]);
   const [filters, setFilters] = useState({
     firstName: null,
@@ -27,14 +28,15 @@ export default function CustomersDemo() {
 
   useEffect(() => {
     CustomerService.getCustomersLarge().then((data) => {
-      setCustomers(data);
+      setOriginalCustomers(data);
+      setFilteredCustomers(data);
       setUniqueCompanies([...new Set(data.map((d) => d.company))]);
     });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   const onApplyFilters = () => {
-    // Fetch data with filters
-    const filteredCustomers = customers.filter((customer) => {
+    // Apply filters to the original data
+    const newFilteredCustomers = originalCustomers.filter((customer) => {
       const firstNameMatch =
         !filters.firstName ||
         customer.name.toLowerCase().includes(filters.firstName.toLowerCase());
@@ -47,8 +49,10 @@ export default function CustomersDemo() {
       return firstNameMatch && lastNameMatch && companyMatch;
     });
 
-    setCustomers(filteredCustomers);
+    setFilteredCustomers(newFilteredCustomers);
   };
+  ///////
+  /////
 
   const exportCSV = () => {
     if (dt.current) {
@@ -144,7 +148,7 @@ export default function CustomersDemo() {
         <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
         <DataTable
           ref={dt}
-          value={customers}
+          value={filteredCustomers}
           paginator
           rows={5}
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
